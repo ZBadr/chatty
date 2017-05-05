@@ -20,8 +20,8 @@ class ChatBar extends Component {
     console.log("Rendering <ChatBar />");
     return (
       <footer className="chatbar">
-        <input className="chatbar-username" placeholder={this.props.currentUser} type="text" value={this.state.name} onChange={this.handleNameChange} />
-        <input className="chatbar-message" placeholder="Type a message and hit ENTER" type="text" onKeyPress={this.props.handleKeyPress}/>
+        <input className="chatbar-username" name="input1" placeholder={this.props.currentUser} type="text"  onKeyPress={this.props.handleKeyPress}/>
+        <input className="chatbar-message" name="input2" placeholder="Type a message and hit ENTER" type="text" onKeyPress={this.props.handleKeyPress}/>
       </footer>
     );
   }
