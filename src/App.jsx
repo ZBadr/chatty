@@ -17,55 +17,53 @@ constructor() {
   }
 
   componentDidMount() {
+    // open a websocket connection everytime a component is loaded into the DOM
     this.socket = new WebSocket('ws://localhost:3001');
 
 
     this.socket.onmessage = (event) => {
 
       let message = JSON.parse(event.data);
-
       switch (message.type) {
+
+        // if message.type is "incoming message" then we add that message object to the array of messages
         case "incomingMessage":
           let newM = this.state.messages.concat(message)
           this.setState({messages: newM})
           break;
+
+        // if message.type is "incoming notification" then we add that message object to the array of notifications
         case "incomingNotification":
-        console.log("Notification: ", message);
           let newN = this.state.notifications.concat(message)
           this.setState({notifications: newN})
           break;
+
         default:
+        // if message.type is anythig else, we throw an error
          throw new Error("Unknown Event Type: " + message.type);
-
       }
-
       console.log("Message: ", message);
-
-
-
     }
-    //console.log("Connected to server");
   }
 
 handleKeyPress = (e) => {
+    // this function is the connection between the parent (App) and it's children
     if (e.key == 'Enter') {
+      /* if the enter is pressed from the chatbar message box, type is added to the message object, username is set
+      to the current state and content is updated to the value of what's typed into the message box*/
       if(e.target.className === 'chatbar-message') {
-      console.log("in handleKeyPress:", e.target.value);
-      const newMessage = {type: "postMessage", username: this.state.currentUser.name, content: e.target.value}
-      // let wsmessage = JSON.parse(newMessage)
-      console.log(newMessage)
-      this.socket.send(JSON.stringify(newMessage));
-      // const updatedMessage = this.state.messages.concat(newMessage)
-      e.target.value = ''
-      // this.setState({messages: updatedMessage})
-      } else if(e.target.className === 'chatbar-username') {
-        let ob = {}
-        ob.type = "postNotification"
-        ob.content = `${this.state.currentUser.name} has changed their name to ${e.target.value}`
-        this.setState({currentUser: {name: e.target.value}})
-        this.socket.send(JSON.stringify(ob));
-        //this.setState({notifications: ob})
-
+          const newMessage = {type: "postMessage", username: this.state.currentUser.name, content: e.target.value}
+          this.socket.send(JSON.stringify(newMessage));
+          e.target.value = ''
+      } else
+      /* if the enter is pressed from the username box, type is added to the notifications object, and
+      a message alert is added to the content of the object. The state is updated to the value typed into the box*/
+      if(e.target.className === 'chatbar-username') {
+          let ob = {}
+          ob.type = "postNotification"
+          ob.content = `${this.state.currentUser.name} has changed their name to ${e.target.value}`
+          this.setState({currentUser: {name: e.target.value}})
+          this.socket.send(JSON.stringify(ob));
       }
     }
   }

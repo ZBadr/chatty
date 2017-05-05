@@ -1,21 +1,6 @@
 import React, {Component} from 'react';
 
 class ChatBar extends Component {
-
-
-    constructor() {
-      super();
-      this.state = {name: '', text: ''}
-    }
-
-    handleNameChange = (e) => {
-      this.setState({name: e.target.value})
-    }
-
-    handleTextChange = (e) => {
-      this.setState({text: e.target.value})
-    }
-
   render() {
     console.log("Rendering <ChatBar />");
     return (

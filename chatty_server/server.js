@@ -14,9 +14,7 @@ const server = express()
 // Create the WebSockets server
 const wss = new SocketServer({ server });
 
-// Set up a callback that will run when a client connects to the server
-// When a client connects they are assigned a socket, represented by
-// the ws parameter in the callback.
+// this function broadcasts the message passed to it to all connected clients
 function broadcast(msg) {
   wss.clients.forEach( c => {
     c.send(msg);
@@ -24,8 +22,8 @@ function broadcast(msg) {
 }
 
 wss.on('connection', (ws) => {
+  
   console.log('Client connected');
-  // ws.send("Connected to server!!");
 
   ws.on('message', (rawMessage) => {
     let message = JSON.parse(rawMessage);
@@ -34,7 +32,7 @@ wss.on('connection', (ws) => {
       message.type = "incomingMessage"
       message.id = id
       broadcast(JSON.stringify(message));
-    // console.log('Id: ' + id + ' User: ' + message.username + ' said ' + message.content);
+
     } else if(message.type === "postNotification") {
       let id = uuidV4()
       message.type = "incomingNotification"
