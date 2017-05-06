@@ -6,7 +6,9 @@ import MessageList from './MessageList.jsx';
 
 const data = {currentUser: {name: "Anonymous"},
               messages: [],
-              notifications: []}
+              notifications: [],
+              users: 0
+          }
 
 class App extends Component {
 
@@ -14,6 +16,7 @@ constructor() {
     super();
     this.state = data;
     this.socket = undefined;
+
   }
 
   componentDidMount() {
@@ -38,11 +41,16 @@ constructor() {
           this.setState({notifications: newN})
           break;
 
+        // if message.type is "numberOfUsers" the number of users online is extracted from the parsed object and the state is set
+        case "numberOfUsers":
+          let userCount = message.users
+          this.setState({users: userCount})
+          break;
+
         default:
         // if message.type is anythig else, we throw an error
          throw new Error("Unknown Event Type: " + message.type);
       }
-      console.log("Message: ", message);
     }
   }
 
@@ -74,6 +82,7 @@ render() {
       <div>
         <nav className="navbar">
           <a href="/" className="navbar-brand">Chatty</a>
+          <div className="navbar-users">{this.state.users} online</div>
         </nav>
         <ChatBar currentUser={this.state.currentUser.name} handleKeyPress={this.handleKeyPress}/>
         <MessageList  messages={this.state.messages}

@@ -20,27 +20,42 @@ function broadcast(msg) {
     c.send(msg);
   })
 }
+// this function counts the users that are online
+function usersOnline (){
+  let clientCounter = 0
+  wss.clients.forEach(c => {
+    clientCounter++
+  })
+  return clientCounter
+}
 
 wss.on('connection', (ws) => {
+  let users = {type: "numberOfUsers", users: usersOnline()}
   
+  broadcast(JSON.stringify(users));
+
+
   console.log('Client connected');
 
   ws.on('message', (rawMessage) => {
     let message = JSON.parse(rawMessage);
     if(message.type === "postMessage") {
-      let id = uuidV4()
       message.type = "incomingMessage"
-      message.id = id
+      message.id = uuidV4()
       broadcast(JSON.stringify(message));
 
-    } else if(message.type === "postNotification") {
-      let id = uuidV4()
+    } else
+    if(message.type === "postNotification") {
       message.type = "incomingNotification"
-      message.id = id
+      message.id = uuidV4()
       broadcast(JSON.stringify(message));
     }
   });
 
   // Set up a callback for when a client closes the socket. This usually means they closed their browser.
-  ws.on('close', () => console.log('Client disconnected'));
+  ws.on('close', () => {
+    users = {type: "numberOfUsers", users: usersOnline()}
+    broadcast(JSON.stringify(users));
+    console.log('Client disconnected')
+});
 });
